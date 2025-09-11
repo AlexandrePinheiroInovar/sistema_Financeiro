@@ -1,0 +1,47 @@
+Tipo,Status,Data efetiva,Valor efetivo,Descrição,Categoria,Conta,Contato,CPF/CNPJ,Razão social,Forma,Observações,Data de criação
+Receita,Pago,01/01/2024,50500.82,Locação de Veiculos,Operacional,1.1.1,Cliente A,12345678901,Cliente A Ltda,PIX,Receita principal,01/01/2024
+Receita,Pago,01/01/2024,24926.20,Emplacamento,Operacional,1.1.12,Cliente B,12345678902,Cliente B Ltda,Cartão,Taxa de emplacamento,01/01/2024
+Receita,Pago,01/01/2024,4074.01,Taxa de Manutenção,Operacional,1.1.2,Cliente C,12345678903,Cliente C Ltda,Transferência,Taxa manutenção,01/01/2024
+Receita,Pago,01/01/2024,139810.00,Venda de Franquia,Comercial,1.1.4,Franqueado A,12345678904,Franqueado A Ltda,Transferência,Venda franquia,01/01/2024
+Receita,Pago,01/01/2024,9024.17,Taxa de Espaço,Operacional,1.1.5,Cliente D,12345678905,Cliente D Ltda,PIX,Taxa espaço,01/01/2024
+Receita,Pago,01/01/2024,9671.63,Taxa de Seguro,Operacional,1.1.6,Seguradora,12345678906,Seguradora XYZ,Transferência,Taxa seguro,01/01/2024
+Receita,Pago,01/01/2024,195000.00,Empréstimo Mútuo,Financeiro,1.2.7,Sócio,12345678907,Sócio Principal,Transferência,Empréstimo,01/01/2024
+Receita,Pago,01/01/2024,4098.45,Devolução e Reembolso,Outros,1.3.3,Diversos,12345678908,Diversos,PIX,Reembolsos,01/01/2024
+Receita,Pago,01/01/2024,1600.00,Programa de Indicação,Marketing,1.3.7,Indicador,12345678909,Indicador A,PIX,Programa indicação,01/01/2024
+Despesa,Pago,01/01/2024,267396.30,Despesas Operacionais,Operacional,2.1.1.1,Fornecedor A,12345678910,Fornecedor A Ltda,Transferência,Despesas operacionais,01/01/2024
+Despesa,Pago,01/01/2024,464.56,Multa Veículo,Operacional,2.1.1.12,DETRAN,12345678911,DETRAN,Boleto,Multa veículo,01/01/2024
+Despesa,Pago,01/01/2024,1608.00,Taxa de Royalties,Operacional,2.1.1.14,Franqueador,12345678912,Franqueador SA,Transferência,Royalties,01/01/2024
+Despesa,Pago,01/01/2024,3150.00,Prestação de serviços PJ,Operacional,2.1.1.3,Prestador,12345678913,Prestador Ltda,PIX,Serviços PJ,01/01/2024
+Despesa,Pago,01/01/2024,4563.64,Reboques / Guinchos,Operacional,2.1.1.6,Guincho A,12345678914,Guincho A Ltda,Cartão,Serviços guincho,01/01/2024
+Despesa,Pago,01/01/2024,1793.12,Combustível E Lubrificantes,Operacional,2.1.1.7,Posto,12345678915,Posto XYZ,Cartão,Combustível,01/01/2024
+Despesa,Pago,01/01/2024,7331.65,Peças - Veículos,Operacional,2.1.2.1,Autopeças,12345678916,Autopeças ABC,Transferência,Peças veículos,01/01/2024
+Despesa,Pago,01/01/2024,6135.00,Rastreador Veicular,Operacional,2.1.2.8,Rastreamento,12345678917,Rastreamento SA,Débito,Rastreadores,01/01/2024
+Despesa,Pago,01/01/2024,534.61,Simples Nacional (DAS),Administrativo,2.1.3.2,Receita Federal,12345678918,União,DARF,Imposto,01/01/2024
+Despesa,Pago,01/01/2024,344.59,DIFAL,Administrativo,2.1.3.3,Receita Estadual,12345678919,Estado,DARF,DIFAL,01/01/2024
+Despesa,Pago,01/01/2024,786.99,FGTS,Pessoal,2.2.2.1,CEF,12345678920,Caixa Econômica,Débito,FGTS funcionários,01/01/2024
+Despesa,Pago,01/01/2024,642.06,INSS / IRRF s/ Salários,Pessoal,2.2.2.1,Receita Federal,12345678921,União,DARF,INSS salários,01/01/2024
+Despesa,Pago,01/01/2024,4942.04,Salário ADM,Pessoal,2.2.3.1,Funcionário ADM,12345678922,Admin A,PIX,Salário administrativo,01/01/2024
+Despesa,Pago,01/01/2024,3146.07,Salário Oficina,Pessoal,2.2.3.1,Funcionário Oficina,12345678923,Mecânico A,PIX,Salário oficina,01/01/2024
+Despesa,Pago,01/01/2024,7261.40,Comissão de Vendas,Comercial,2.2.3.6,Vendedor,12345678924,Vendedor A,PIX,Comissão vendas,01/01/2024
+Despesa,Pago,01/01/2024,4500.00,Pró-Labore,Administrativo,2.2.3.9,Sócio,12345678925,Sócio Administrador,PIX,Pró-labore,01/01/2024
+Despesa,Pago,01/01/2024,3258.20,Vale alimentação,Pessoal,2.2.4.1,Benefícios SA,12345678926,Benefícios SA,Débito,Vale alimentação,01/01/2024
+Despesa,Pago,01/01/2024,3288.00,Vale Transporte,Pessoal,2.2.4.2,Transporte,12345678927,VT SA,Débito,Vale transporte,01/01/2024
+Despesa,Pago,01/01/2024,55.08,Confraternização,Administrativo,2.2.5.03,Restaurante,12345678928,Restaurante ABC,Cartão,Eventos,01/01/2024
+Despesa,Pago,01/01/2024,30.00,Combustível adm,Administrativo,2.2.5.04,Posto ADM,12345678929,Posto ADM,Cartão,Combustível admin,01/01/2024
+Despesa,Pago,01/01/2024,86.42,Correios / Uber,Administrativo,2.2.5.05,Correios,12345678930,Correios,Dinheiro,Correios e taxi,01/01/2024
+Despesa,Pago,01/01/2024,1533.90,Serviços de Terceiros,Administrativo,2.2.5.08,Terceirizado,12345678931,Terceirizado Ltda,Transferência,Serviços terceiros,01/01/2024
+Despesa,Pago,01/01/2024,480.17,Material de escritório,Administrativo,2.2.5.13,Papelaria,12345678932,Papelaria XYZ,Cartão,Material escritório,01/01/2024
+Despesa,Pago,01/01/2024,419.41,Limpeza e Higienização,Administrativo,2.2.5.14,Limpeza,12345678933,Limpeza SA,Débito,Limpeza,01/01/2024
+Despesa,Pago,01/01/2024,2027.24,Marketing e Publicidades,Marketing,2.2.5.20,Agência,12345678934,Agência Digital,Cartão,Marketing,01/01/2024
+Despesa,Pago,01/01/2024,28326.85,IPVA/ Licenciamento,Operacional,2.2.5.21,DETRAN,12345678935,DETRAN,Boleto,IPVA licenciamento,01/01/2024
+Despesa,Pago,01/01/2024,2780.00,Campanha Indique e Ganhe,Marketing,2.2.5.24,Marketing,12345678936,Campanha SA,PIX,Campanha marketing,01/01/2024
+Despesa,Pago,01/01/2024,150.00,IPTU,Administrativo,2.2.6.21,Prefeitura,12345678937,Prefeitura,Boleto,IPTU,01/01/2024
+Despesa,Pago,01/01/2024,858.84,Mensalidade de sistema,Administrativo,2.2.6.6,Software SA,12345678938,Software SA,Débito,Sistema TI,01/01/2024
+Despesa,Pago,01/01/2024,250.00,Honorários Contábeis,Administrativo,2.2.6.7,Contador,12345678939,Contador Ltda,Transferência,Contabilidade,01/01/2024
+Despesa,Pago,01/01/2024,773.93,Tarifa e Taxas Bancária,Financeiro,2.3.1.1,Banco,12345678940,Banco SA,Débito,Tarifas bancárias,01/01/2024
+Despesa,Pago,01/01/2024,217.25,Juros de Mora,Financeiro,2.3.1.4,Banco,12345678941,Banco SA,Débito,Juros mora,01/01/2024
+Despesa,Pago,01/01/2024,4.09,IOF,Financeiro,2.3.1.5,Banco,12345678942,Banco SA,Débito,IOF,01/01/2024
+Despesa,Pago,01/01/2024,135000.00,Empréstimo Mútuo,Financeiro,2.3.1.7,Sócio,12345678943,Sócio Principal,Transferência,Pagamento empréstimo,01/01/2024
+Despesa,Pago,01/01/2024,5973.80,Consórcios,Financeiro,2.3.1.8,Consórcio,12345678944,Consórcio ABC,Débito,Parcela consórcio,01/01/2024
+Despesa,Pago,01/01/2024,28548.82,Reembolso e Estornos,Outros,2.3.1.9,Diversos,12345678945,Diversos,PIX,Reembolsos,01/01/2024
+Despesa,Pago,01/01/2024,6130.57,Construção / Reformas,Administrativo,2.3.2.6,Construção,12345678946,Construção Ltda,Transferência,Reformas,01/01/2024

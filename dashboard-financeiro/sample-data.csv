@@ -1,0 +1,16 @@
+Tipo,Status,Data efetiva,Valor efetivo,Descrição,Categoria,Conta,Contato,CPF/CNPJ,Razão social,Forma,Observações,Data de criação
+Receita,Pago,2024-01-15,50000,Venda de produtos,Vendas,Caixa,Cliente A,12345678901,Empresa A Ltda,Dinheiro,,2024-01-15
+Receita,Pago,2024-01-20,75000,Prestação de serviços,Serviços,Banco,Cliente B,98765432100,Empresa B SA,Transferência,,2024-01-20
+Custo,Pago,2024-01-10,20000,Compra de matéria-prima,Matéria Prima,Fornecedor,Fornecedor X,11122233344,Fornecedor X Ltda,Boleto,,2024-01-10
+Custo,Pago,2024-01-25,15000,Custos de produção,Produção,Banco,Fornecedor Y,55566677788,Fornecedor Y SA,PIX,,2024-01-25
+Despesa,Pago,2024-01-05,8000,Aluguel do escritório,Aluguel,Banco,Imobiliária,99988877766,Imobiliária Z,Transferência,,2024-01-05
+Despesa,Pago,2024-01-12,3000,Material de escritório,Administrativo,Cartão,Papelaria,44455566677,Papelaria ABC,Cartão Crédito,,2024-01-12
+Receita,Pago,2024-02-10,60000,Venda de produtos,Vendas,Caixa,Cliente C,22233344455,Cliente C Ltda,Dinheiro,,2024-02-10
+Receita,Pendente,2024-02-15,45000,Prestação de serviços,Serviços,Banco,Cliente D,66677788899,Cliente D SA,Boleto,Vencimento 20/02,2024-02-15
+Custo,Pago,2024-02-08,18000,Compra de matéria-prima,Matéria Prima,Fornecedor,Fornecedor X,11122233344,Fornecedor X Ltda,Boleto,,2024-02-08
+Despesa,Pago,2024-02-05,8000,Aluguel do escritório,Aluguel,Banco,Imobiliária,99988877766,Imobiliária Z,Transferência,,2024-02-05
+Despesa,Atrasado,2024-02-20,2500,Internet,Telecomunicações,Banco,Telecom,33344455566,Telecom Brasil,Débito Automático,Vencimento 18/02,2024-02-20
+Receita,Pago,2024-03-05,80000,Venda de produtos,Vendas,Banco,Cliente E,77788899900,Cliente E SA,Transferência,,2024-03-05
+Custo,Pago,2024-03-12,25000,Custos de produção,Produção,Fornecedor,Fornecedor Z,12312312312,Fornecedor Z,PIX,,2024-03-12
+Despesa,Pago,2024-03-05,8000,Aluguel do escritório,Aluguel,Banco,Imobiliária,99988877766,Imobiliária Z,Transferência,,2024-03-05
+Despesa,Pago,2024-03-15,5000,Marketing digital,Marketing,Cartão,Agência Digital,45645645645,Agência XYZ,Cartão Crédito,,2024-03-15

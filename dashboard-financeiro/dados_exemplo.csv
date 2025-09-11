@@ -1,0 +1,13 @@
+Tipo,Status,Data efetiva,Valor efetivo,Descrição,Categoria,Conta,Contato,CPF/CNPJ,Razão social,Forma,Observações,Data de criação
+Receita,Pago,01/01/2024,5000.00,Venda de produto A,Vendas,Conta Corrente,Cliente A,12345678901,Cliente A Ltda,Cartão,Pagamento à vista,01/01/2024
+Receita,Pago,02/01/2024,3000.00,Venda de produto B,Vendas,Conta Corrente,Cliente B,12345678902,Cliente B Ltda,PIX,Pagamento à vista,02/01/2024
+Receita,Pendente,03/01/2024,2000.00,Venda de produto C,Vendas,Conta Corrente,Cliente C,12345678903,Cliente C Ltda,Boleto,Prazo 30 dias,03/01/2024
+Custo,Pago,01/01/2024,1500.00,Compra de matéria-prima,Produção,Conta Corrente,Fornecedor A,12345678904,Fornecedor A Ltda,Transferência,Material para produtos,01/01/2024
+Custo,Pago,02/01/2024,800.00,Mão de obra direta,Produção,Conta Corrente,Funcionário A,12345678905,João Silva,PIX,Pagamento mensal,02/01/2024
+Despesa,Pago,01/01/2024,1200.00,Aluguel do escritório,Administrativo,Conta Corrente,Imobiliária XYZ,12345678906,Imobiliária XYZ Ltda,Transferência,Aluguel mensal,01/01/2024
+Despesa,Pago,05/01/2024,300.00,Conta de energia,Utilidades,Conta Corrente,Companhia Elétrica,12345678907,Eletricidade S.A.,Débito automático,Consumo mensal,05/01/2024
+Despesa,Pendente,10/01/2024,150.00,Material de escritório,Administrativo,Conta Corrente,Papelaria ABC,12345678908,Papelaria ABC Ltda,Boleto,Compra de materiais,10/01/2024
+Receita,Pago,15/01/2024,4500.00,Venda de serviço,Serviços,Conta Corrente,Cliente D,12345678909,Cliente D S.A.,Cartão,Serviço prestado,15/01/2024
+Custo,Pago,15/01/2024,600.00,Materiais para serviço,Serviços,Conta Corrente,Fornecedor B,12345678910,Fornecedor B Ltda,PIX,Material consumido,15/01/2024
+Despesa,Pago,20/01/2024,250.00,Marketing digital,Marketing,Conta Corrente,Agência Digital,12345678911,Digital Marketing Ltda,Cartão,Campanha publicitária,20/01/2024
+Receita,Pago,25/01/2024,1800.00,Venda de produto D,Vendas,Conta Corrente,Cliente E,12345678912,Cliente E ME,PIX,Venda parcelada,25/01/2024
