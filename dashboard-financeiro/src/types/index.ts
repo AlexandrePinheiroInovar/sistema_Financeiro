@@ -30,6 +30,7 @@ export interface DREData {
   lucroBruto: number;
   lucroLiquido: number;
   margemLiquida: number;
+  saidasTotais?: number;
 }
 
 export interface ChartData {

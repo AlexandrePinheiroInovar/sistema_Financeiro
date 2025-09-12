@@ -43,33 +43,73 @@ export class DataService {
         try {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          
-          // Try sheet_to_json with header: 1 first, then try with defval
-          let jsonData;
-          try {
-            jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-          } catch (err) {
-            jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-          }
-          
-          console.log('Excel parsed data:', jsonData);
-          
-          if (jsonData.length < 2) {
-            throw new Error('Planilha deve conter pelo menos uma linha de cabeçalho e uma linha de dados.');
-          }
+          const allSheets = workbook.SheetNames || [];
+          console.log('📋 Abas encontradas no arquivo:', allSheets);
 
-          // Check if it's already in object format or array format
-          let objectData;
-          if (Array.isArray(jsonData[0])) {
-            // Array format - convert to objects
-            const headers = jsonData[0] as string[];
-            const rows = jsonData.slice(1) as any[][];
+          const objectDataAll: any[] = [];
+          let totalRawRows = 0;
+          let totalFilteredRows = 0;
+
+          for (const name of allSheets) {
+            console.log(`\n🔍 Processando aba: "${name}"`);
+            const ws = workbook.Sheets[name];
+            if (!ws) {
+              console.log(`❌ Aba ${name}: worksheet vazio`);
+              continue;
+            }
             
-            objectData = rows
-              .filter(row => row && row.length > 0 && row.some(cell => cell !== '' && cell !== null && cell !== undefined))
-              .map(row => {
+            let jsonDataSheet: any;
+            try {
+              jsonDataSheet = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+            } catch (err) {
+              console.log(`⚠️ Fallback para método alternativo na aba ${name}:`, err);
+              jsonDataSheet = XLSX.utils.sheet_to_json(ws, { defval: '' });
+            }
+            
+            console.log(`📊 Aba ${name}: ${jsonDataSheet.length} linhas brutas`);
+            totalRawRows += jsonDataSheet.length;
+            
+            if (!jsonDataSheet || jsonDataSheet.length < 2) {
+              console.log(`❌ Aba ${name}: ignorada (menos de 2 linhas)`);
+              continue;
+            }
+
+            let sheetObjects: any[] = [];
+            if (Array.isArray(jsonDataSheet[0])) {
+              const headers = (jsonDataSheet[0] as string[]).map(h => String(h || '').trim());
+              console.log(`📋 Headers da aba ${name} (${headers.length} colunas):`, headers);
+              
+              const rows = jsonDataSheet.slice(1) as any[][];
+              console.log(`📊 Aba ${name}: ${rows.length} linhas de dados (sem header)`);
+              
+              // Check for exactly your data structure: 13 columns, 7864 total rows
+              if (headers.length === 13 && jsonDataSheet.length === 7865) { // 7864 data + 1 header
+                console.log(`🎯 ENCONTROU ESTRUTURA ESPERADA: 13 colunas, ${jsonDataSheet.length - 1} linhas de dados`);
+              }
+              
+              // More detailed filtering with counts
+              let emptyRows = 0;
+              let validRows = 0;
+              
+              const filteredRows = rows.filter(row => {
+                if (!row || row.length === 0) {
+                  emptyRows++;
+                  return false;
+                }
+                
+                const hasData = row.some(cell => cell !== '' && cell !== null && cell !== undefined);
+                if (!hasData) {
+                  emptyRows++;
+                  return false;
+                }
+                
+                validRows++;
+                return true;
+              });
+              
+              console.log(`✅ Aba ${name}: ${validRows} linhas válidas, ${emptyRows} linhas vazias/inválidas`);
+              
+              sheetObjects = filteredRows.map(row => {
                 const obj: any = {};
                 headers.forEach((header, index) => {
                   if (header && header.trim() !== '') {
@@ -78,18 +118,30 @@ export class DataService {
                 });
                 return obj;
               });
-          } else {
-            // Already in object format
-            objectData = jsonData.filter((row: any) => row && Object.keys(row).length > 0);
+              
+              // Show sample of first few objects
+              if (sheetObjects.length > 0) {
+                console.log(`🔍 Amostra da primeira linha processada (aba ${name}):`, sheetObjects[0]);
+              }
+            } else {
+              sheetObjects = (jsonDataSheet as any[]).filter((row: any) => row && Object.keys(row).length > 0);
+            }
+            
+            console.log(`✅ Aba ${name}: ${sheetObjects.length} objetos finais`);
+            totalFilteredRows += sheetObjects.length;
+            objectDataAll.push(...sheetObjects);
           }
 
-          console.log('Converted object data:', objectData);
-
-          if (objectData.length === 0) {
-            throw new Error('Nenhum registro válido encontrado na planilha.');
+          console.log(`\n📊 RESUMO EXCEL:`);
+          console.log(`📋 Total de abas: ${allSheets.length}`);
+          console.log(`📊 Total linhas brutas (todas as abas): ${totalRawRows}`);
+          console.log(`✅ Total linhas filtradas (todas as abas): ${totalFilteredRows}`);
+          console.log(`🎯 Total objetos combinados: ${objectDataAll.length}`);
+          if (objectDataAll.length === 0) {
+            throw new Error('Nenhum registro válido encontrado em nenhuma aba.');
           }
 
-          const records = this.mapToFinancialRecords(objectData);
+          const records = this.mapToFinancialRecords(objectDataAll);
           resolve(records);
         } catch (error) {
           console.error('Excel parsing error:', error);
@@ -107,15 +159,21 @@ export class DataService {
 
   private static mapToFinancialRecords(data: any[]): FinancialRecord[] {
     // First, let's analyze the data structure and clean it
-    console.log('Raw data received:', data);
+    console.log('🔍 Raw data received - Total rows:', data.length);
     
     // Filter out invalid rows and find the actual data
     const cleanedData = data.filter((row, index) => {
       // Skip rows that don't look like financial records
-      if (!row || typeof row !== 'object') return false;
+      if (!row || typeof row !== 'object') {
+        console.log(`❌ Row ${index + 1}: Invalid object`);
+        return false;
+      }
       
       const keys = Object.keys(row);
-      console.log(`Row ${index + 1} keys:`, keys);
+      if (keys.length === 0) {
+        console.log(`❌ Row ${index + 1}: Empty object`);
+        return false;
+      }
       
       // Skip rows that look like headers or metadata
       const invalidPatterns = [
@@ -132,7 +190,7 @@ export class DataService {
       );
       
       if (hasInvalidPattern) {
-        console.log(`Skipping row ${index + 1} - appears to be metadata`);
+        console.log(`❌ Row ${index + 1}: Metadata pattern detected`);
         return false;
       }
       
@@ -149,31 +207,52 @@ export class DataService {
         !isNaN(parseFloat(String(row[key])))
       );
       
-      if (!hasTipoField && !hasValueField) {
-        console.log(`Skipping row ${index + 1} - no tipo or value fields found`);
+      // Be more permissive - if row has any meaningful data, keep it
+      const hasAnyData = keys.some(key => {
+        const value = row[key];
+        return value !== null && value !== undefined && String(value).trim() !== '';
+      });
+      
+      if (!hasAnyData) {
+        console.log(`❌ Row ${index + 1}: No meaningful data`);
         return false;
+      }
+      
+      // Only skip if we're very sure it's not financial data
+      if (!hasTipoField && !hasValueField) {
+        // Check if any value looks like a financial amount
+        const hasFinancialAmount = keys.some(key => {
+          const value = String(row[key]);
+          return /^-?[\d.,]+$/.test(value.replace(/[R$\s]/g, ''));
+        });
+        
+        if (!hasFinancialAmount) {
+          console.log(`❌ Row ${index + 1}: No financial fields detected - Keys: ${keys.slice(0, 3).join(', ')}...`);
+          return false;
+        }
       }
       
       return true;
     });
     
-    console.log('Cleaned data:', cleanedData);
+    console.log('✅ Cleaned data - Valid rows:', cleanedData.length);
+    console.log('❌ Filtered out rows:', data.length - cleanedData.length);
     
     if (cleanedData.length === 0) {
       throw new Error('Nenhum registro financeiro válido encontrado. Verifique se a planilha contém as colunas: Tipo, Valor efetivo, Status, Data efetiva, Descrição, Categoria.');
     }
 
-    // Filtro inicial: considerar apenas registros com Status = Conciliado
-    const conciliadoData = cleanedData.filter(row => {
-      const statusField = String(row['Status'] || row['status'] || '').trim();
-      return statusField === 'Conciliado';
-    });
+    // Incluir TODOS os status (sem filtro) para somar tudo conforme solicitado
+    const allStatusData = cleanedData;
+    console.log(`📊 Using ${allStatusData.length} records (all status) from ${cleanedData.length} valid lines`);
+    console.log(`📉 Total discarded: ${data.length - allStatusData.length} rows`);
     
-    console.log(`Filtered to ${conciliadoData.length} 'Conciliado' records from ${cleanedData.length} total`);
-    
-    return conciliadoData.map((row, index) => {
+    const processedRecords = allStatusData.map((row, index) => {
       try {
-        console.log(`Processing cleaned row ${index + 1}:`, row);
+        // Reduced logging for performance - only log every 1000th record
+        if (index % 1000 === 0) {
+          console.log(`⚙️ Processing record ${index + 1}/${allStatusData.length}...`);
+        }
         
         // Get the field value with multiple possible keys
         const getTipoField = () => {
@@ -270,7 +349,12 @@ export class DataService {
         const errorMessage = error instanceof Error ? error.message : String(error);
         throw new Error(`Erro na linha ${index + 1}: ${errorMessage}`);
       }
-    }); // Removendo filtro que excluía registros com valor 0
+    });
+    
+    console.log(`✅ FINAL RESULT: ${processedRecords.length} records processed successfully`);
+    console.log(`📊 Summary: ${data.length} → ${cleanedData.length} → ${processedRecords.length}`);
+    
+    return processedRecords;
   }
 
   private static validateTipo(tipo: string): 'Receita' | 'Custo' | 'Despesa' {
@@ -378,9 +462,9 @@ export class DataService {
     console.log('Total de registros para cálculo:', records.length);
     
     // Filtro: Ignorar registros vazios ou nulos em Valor efetivo
-    const validRecords = records.filter(r => r.valorEfetivo && !isNaN(r.valorEfetivo) && r.valorEfetivo !== 0);
+    const validRecords = records; // somar tudo, sem filtrar zeros/status
     
-    // RECEITA BRUTA = soma de todas as categorias iniciadas por 1.x
+    // RECEITA BRUTA = soma de todas as categorias iniciadas por 1.x (sempre positiva)
     const receitaBruta = validRecords
       .filter(r => (r.categoria || '').startsWith('1.'))
       .reduce((sum, r) => sum + Math.abs(r.valorEfetivo), 0); // Receita → sempre positivo
@@ -397,6 +481,11 @@ export class DataService {
     const despesas = validRecords
       .filter(r => (r.categoria || '').startsWith('2.2.') || (r.categoria || '').startsWith('2.3.'))
       .reduce((sum, r) => sum + Math.abs(r.valorEfetivo), 0); // Despesa → sempre negativo (mas usamos valor absoluto aqui)
+    
+    // SAÍDAS TOTAIS (2.x) COM O SINAL ORIGINAL (para bater com a pivot do Excel)
+    const saidasComSinal = validRecords
+      .filter(r => (r.categoria || '').startsWith('2.'))
+      .reduce((sum, r) => sum + (Number(r.valorEfetivo) || 0), 0);
     
     // LUCRO LÍQUIDO = Lucro Bruto – Despesas Administrativas  
     const lucroLiquido = lucroBruto - despesas;
@@ -418,12 +507,13 @@ export class DataService {
       despesas,
       lucroBruto,
       lucroLiquido,
-      margemLiquida
+      margemLiquida,
+      saidasTotais: Math.abs(saidasComSinal)
     };
   }
 
   static getCategoryData(records: FinancialRecord[]): ChartData[] {
-    const validRecords = records.filter(r => r.valorEfetivo && !isNaN(r.valorEfetivo) && r.valorEfetivo !== 0);
+    const validRecords = records; // somar tudo
     
     // Distribuição por tipo baseado na estrutura de categorias DRE
     const custos = validRecords
@@ -441,7 +531,7 @@ export class DataService {
   }
 
   static getEvolutionData(records: FinancialRecord[]): ChartData[] {
-    const validRecords = records.filter(r => r.valorEfetivo && !isNaN(r.valorEfetivo) && r.valorEfetivo !== 0);
+    const validRecords = records; // somar tudo
     const monthlyData: { [key: string]: { receita: number; custos: number; despesas: number } } = {};
     
     validRecords.forEach(record => {
@@ -484,7 +574,7 @@ export class DataService {
   }
 
   static getComparisonData(records: FinancialRecord[]): ChartData[] {
-    const validRecords = records.filter(r => r.valorEfetivo && !isNaN(r.valorEfetivo) && r.valorEfetivo !== 0);
+    const validRecords = records; // somar tudo
     
     // Usar estrutura de categorias DRE
     const receita = validRecords
@@ -574,7 +664,7 @@ export class DataService {
   }
 
   static getMonthlyDRE(records: FinancialRecord[]): MonthlyPivotRow[] {
-    const validRecords = records.filter(r => r.valorEfetivo && !isNaN(r.valorEfetivo) && r.valorEfetivo !== 0);
+    const validRecords = records; // somar tudo
     
     // Initialize monthly data structure
     const monthlyData: { [key in MonthKey]: {
@@ -655,5 +745,78 @@ export class DataService {
       lucroLiquidoRow,
       margemLiquidaRow
     ];
+  }
+
+  // === DRE Detalhado: Pivot mensal por categoria (todas as categorias 1.x e 2.x) ===
+  static getMonthlyByCategory(records: FinancialRecord[]): MonthlyPivotRow[] {
+    const validRecords = records.filter(r => r.valorEfetivo && !isNaN(r.valorEfetivo) && r.valorEfetivo !== 0);
+
+    // Mapa por categoria
+    type CatRow = { name: string; group: 'Despesa' | 'Receita' | 'Total'; months: Record<MonthKey, number>; total: number };
+    const byCategory = new Map<string, CatRow>();
+
+    const ensureRow = (categoria: string, group: 'Despesa' | 'Receita') => {
+      if (!byCategory.has(categoria)) {
+        byCategory.set(categoria, {
+          name: categoria,
+          group,
+          months: this.initMonths(),
+          total: 0
+        });
+      }
+      return byCategory.get(categoria)!;
+    };
+
+    // Totais por grupo
+    const totalDespesa: CatRow = { name: 'Despesa', group: 'Despesa', months: this.initMonths(), total: 0 };
+    const totalReceita: CatRow = { name: 'Receita', group: 'Receita', months: this.initMonths(), total: 0 };
+
+    // Percorre lançamentos e agrega por mês
+    for (const r of validRecords) {
+      const categoria = (r.categoria || '').trim();
+      if (!categoria) continue;
+
+      const month = this.toMonthKey(r.dataEfetiva);
+      const valueAbs = Math.abs(r.valorEfetivo);
+
+      if (categoria.startsWith('1.')) {
+        const row = ensureRow(categoria, 'Receita');
+        row.months[month] += valueAbs; // receitas positivas
+        row.total += valueAbs;
+        totalReceita.months[month] += valueAbs;
+        totalReceita.total += valueAbs;
+      } else if (categoria.startsWith('2.')) {
+        const row = ensureRow(categoria, 'Despesa');
+        row.months[month] -= valueAbs; // despesas negativas
+        row.total -= valueAbs;
+        totalDespesa.months[month] -= valueAbs;
+        totalDespesa.total -= valueAbs;
+      }
+    }
+
+    // Ordenar categorias por código (ordem natural)
+    const categoryRows = Array.from(byCategory.values()).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true }));
+
+    // Linha de Total Geral (resultado)
+    const totalGeral: CatRow = { name: 'Total Geral', group: 'Total', months: this.initMonths(), total: 0 };
+    this.monthKeys.forEach((m) => {
+      const val = (totalReceita.months[m] || 0) + (totalDespesa.months[m] || 0);
+      totalGeral.months[m] = val;
+      totalGeral.total += val;
+    });
+
+    // Retornar na ordem: cabeçalho Despesa, linhas 2.x, cabeçalho Receita, linhas 1.x, Total Geral
+    const despesas = categoryRows.filter(r => r.group === 'Despesa');
+    const receitas = categoryRows.filter(r => r.group === 'Receita');
+
+    const rows: MonthlyPivotRow[] = [
+      totalDespesa as MonthlyPivotRow,
+      ...despesas as MonthlyPivotRow[],
+      totalReceita as MonthlyPivotRow,
+      ...receitas as MonthlyPivotRow[],
+      totalGeral as MonthlyPivotRow,
+    ];
+
+    return rows;
   }
 }

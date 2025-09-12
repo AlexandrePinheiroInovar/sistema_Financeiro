@@ -65,15 +65,15 @@ export const DRE: React.FC<DREProps> = ({ records }) => {
         </div>
       </div>
 
-      <div className="dre-summary">
-        <div className="summary-item">
-          <span>Total de Entradas:</span>
-          <span className="positive">{formatCurrency(dre.receitaBruta)}</span>
-        </div>
-        <div className="summary-item">
-          <span>Total de Saídas:</span>
-          <span className="negative">{formatCurrency(dre.custos + dre.despesas)}</span>
-        </div>
+        <div className="dre-summary">
+          <div className="summary-item">
+            <span>Total de Entradas:</span>
+            <span className="positive">{formatCurrency(dre.receitaBruta)}</span>
+          </div>
+          <div className="summary-item">
+            <span>Total de Saídas:</span>
+            <span className="negative">{formatCurrency(dre.saidasTotais ?? (dre.custos + dre.despesas))}</span>
+          </div>
         <div className="summary-item final-result">
           <span>Resultado Final:</span>
           <span className={getValueClass(dre.lucroLiquido)}>

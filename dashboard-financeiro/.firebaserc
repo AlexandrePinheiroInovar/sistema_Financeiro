@@ -1,6 +1,6 @@
 {
-  projects: {
-    default: SEU_PROJETO_FIREBASE
+  "projects": {
+    "default": "sistema-financeiro-41aa8"
   }
 }
 

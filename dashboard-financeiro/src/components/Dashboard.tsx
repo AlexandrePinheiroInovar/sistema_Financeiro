@@ -3,6 +3,7 @@ import { FileUpload } from './FileUpload';
 import { KPICards } from './Cards/KPICards';
 import { DRE } from './DRE';
 import { DREPivot } from './DREPivot';
+import { DREFullPivot } from './DREFullPivot';
 import { CustomPieChart } from './Charts/PieChart';
 import { CustomLineChart } from './Charts/LineChart';
 import { CustomBarChart } from './Charts/BarChart';
@@ -18,7 +19,8 @@ export const Dashboard: React.FC = () => {
   const [records, setRecords] = useState<FinancialRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<FinancialRecord[]>([]);
   const [darkMode, setDarkMode] = useState(true);
-  const [disableDevAutoload, setDisableDevAutoload] = useState(false);
+  // Desabilitado por padrão para o app considerar sempre o arquivo enviado
+  const [disableDevAutoload, setDisableDevAutoload] = useState(true);
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>({ 
     type: 'monthly', 
     period: 'all' 
@@ -248,6 +250,8 @@ export const Dashboard: React.FC = () => {
             <DataTable records={finalFilteredRecords} />
 
             <DREPivot records={finalFilteredRecords} />
+
+            <DREFullPivot records={finalFilteredRecords} />
           </>
         )}
       </div>
