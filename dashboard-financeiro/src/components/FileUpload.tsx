@@ -4,9 +4,10 @@ import { FinancialRecord } from '../types';
 
 interface FileUploadProps {
   onDataLoaded: (data: FinancialRecord[]) => void;
+  userRole?: 'admin' | 'user' | null;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded, userRole }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -72,38 +73,80 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
     }
   };
 
+  const isAdmin = userRole === 'admin';
+
   return (
     <div
-      className={`upload-section ${dragActive ? 'drag-active' : ''}`}
-      onDragEnter={handleDrag}
-      onDragLeave={handleDrag}
-      onDragOver={handleDrag}
-      onDrop={handleDrop}
+      className={`upload-section ${dragActive && isAdmin ? 'drag-active' : ''}`}
+      onDragEnter={isAdmin ? handleDrag : undefined}
+      onDragLeave={isAdmin ? handleDrag : undefined}
+      onDragOver={isAdmin ? handleDrag : undefined}
+      onDrop={isAdmin ? handleDrop : undefined}
     >
       <div className="upload-content">
         <div className="upload-icon">
           📊
         </div>
-        
+
         {loading ? (
           <div className="loading">
             <div>Processando arquivo...</div>
           </div>
         ) : (
           <>
-            <h3>Carregue sua planilha financeira</h3>
-            <p>Arraste e solte um arquivo CSV ou XLSX aqui, ou clique para selecionar</p>
-            
-            <input
-              type="file"
-              id="file-input"
-              accept=".csv,.xlsx,.xls"
-              onChange={handleFileInput}
-            />
-            
-            <label htmlFor="file-input" className="upload-button">
-              Selecionar Arquivo
-            </label>
+            <h3>
+              {isAdmin ? 'Carregue sua planilha financeira' : 'Área de Upload de Planilhas'}
+            </h3>
+            <p>
+              {isAdmin
+                ? 'Arraste e solte um arquivo CSV ou XLSX aqui, ou clique para selecionar'
+                : 'Instruções para preparação de planilhas financeiras'
+              }
+            </p>
+
+            {/* Botão de upload - apenas para administradores */}
+            {isAdmin && (
+              <>
+                <input
+                  type="file"
+                  id="file-input"
+                  accept=".csv,.xlsx,.xls"
+                  onChange={handleFileInput}
+                />
+
+                <label htmlFor="file-input" className="upload-button">
+                  Selecionar Arquivo
+                </label>
+              </>
+            )}
+
+            {/* Aviso para usuários não-admin */}
+            {!isAdmin && (
+              <div style={{
+                backgroundColor: '#fef3c7',
+                border: '2px solid #f59e0b',
+                borderRadius: '8px',
+                padding: '16px',
+                margin: '16px 0',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🔒</div>
+                <p style={{
+                  margin: 0,
+                  fontWeight: '600',
+                  color: '#92400e'
+                }}>
+                  Upload restrito a Administradores
+                </p>
+                <p style={{
+                  margin: '4px 0 0 0',
+                  fontSize: '14px',
+                  color: '#92400e'
+                }}>
+                  Entre em contato com um administrador para fazer upload de planilhas
+                </p>
+              </div>
+            )}
 
             <div className="file-requirements">
               <div className="required-columns">
@@ -117,7 +160,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
                   <li>Categoria</li>
                 </ul>
               </div>
-              
+
               <div className="upload-tips">
                 <p><strong>💡 Dicas importantes:</strong></p>
                 <ul>
@@ -125,6 +168,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
                   <li>Primeira linha deve ser o cabeçalho</li>
                   <li>Remova linhas vazias ou de totais</li>
                   <li>Cada linha = um registro financeiro</li>
+                  {isAdmin && <li><strong>Arraste e solte</strong> o arquivo na área acima</li>}
                 </ul>
               </div>
             </div>

@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // REGRA TEMPORÁRIA PARA DESENVOLVIMENTO E TESTES
+    // Permite acesso total - USE APENAS PARA TESTAR A FUNCIONALIDADE
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // REGRAS DE PRODUÇÃO (comentadas por enquanto)
+    // Descomente quando quiser implementar segurança real
+    /*
+    // Regras para a coleção de registros financeiros
+    match /financial_records/{document} {
+      // Permitir leitura e escrita para usuários autenticados
+      // Cada usuário só pode acessar seus próprios dados
+      allow read, write: if request.auth != null && 
+        (resource.data.userId == request.auth.token.email || 
+         resource.data.userId == request.auth.uid);
+      
+      // Permitir criação de novos documentos para usuários autenticados
+      allow create: if request.auth != null && 
+        (request.resource.data.userId == request.auth.token.email || 
+         request.resource.data.userId == request.auth.uid);
+    }
+    */
+  }
+}

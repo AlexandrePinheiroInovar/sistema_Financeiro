@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { UserCard } from './UserCard';
 import goLogo from '../../GO-removebg-preview-2-300x252.png';
 
 interface SidebarItem {
@@ -55,10 +54,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle 
           </button>
         ))}
       </nav>
-
-      <div className="sidebar-footer">
-        <UserCard isCollapsed={isCollapsed} />
-      </div>
     </div>
   );
 };

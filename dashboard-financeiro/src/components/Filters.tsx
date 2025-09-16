@@ -1,5 +1,6 @@
 import React from 'react';
 import { FinancialRecord } from '../types';
+import { MultiSelectDropdown } from './MultiSelectDropdown';
 
 interface FiltersProps {
   records: FinancialRecord[];
@@ -9,8 +10,8 @@ interface FiltersProps {
 interface FilterState {
   dateFrom: string;
   dateTo: string;
-  status: string;
-  categoria: string;
+  selectedStatus: string[];
+  selectedCategories: string[];
   searchText: string;
 }
 
@@ -18,13 +19,13 @@ export const Filters: React.FC<FiltersProps> = ({ records, onFilterChange }) => 
   const [filters, setFilters] = React.useState<FilterState>({
     dateFrom: '',
     dateTo: '',
-    status: '',
-    categoria: '',
+    selectedStatus: [],
+    selectedCategories: [],
     searchText: ''
   });
 
   const categories = React.useMemo(() => {
-    const uniqueCategories = [...new Set(records.map(r => r.categoria).filter(Boolean))];
+    const uniqueCategories = Array.from(new Set(records.map(r => r.categoria).filter(Boolean)));
     return uniqueCategories.sort();
   }, [records]);
 
@@ -59,14 +60,18 @@ export const Filters: React.FC<FiltersProps> = ({ records, onFilterChange }) => 
       });
     }
 
-    // Filter by status
-    if (newFilters.status) {
-      filtered = filtered.filter(record => record.status === newFilters.status);
+    // Filter by selected status
+    if (newFilters.selectedStatus.length > 0) {
+      filtered = filtered.filter(record => 
+        newFilters.selectedStatus.includes(record.status)
+      );
     }
 
-    // Filter by categoria
-    if (newFilters.categoria) {
-      filtered = filtered.filter(record => record.categoria === newFilters.categoria);
+    // Filter by selected categories
+    if (newFilters.selectedCategories.length > 0) {
+      filtered = filtered.filter(record => 
+        newFilters.selectedCategories.includes(record.categoria)
+      );
     }
 
     // Filter by search text (description, contact, razaoSocial)
@@ -88,12 +93,24 @@ export const Filters: React.FC<FiltersProps> = ({ records, onFilterChange }) => 
     applyFilters(newFilters);
   };
 
+  const handleCategoryChange = (selectedCategories: string[]) => {
+    const newFilters = { ...filters, selectedCategories };
+    setFilters(newFilters);
+    applyFilters(newFilters);
+  };
+
+  const handleStatusChange = (selectedStatus: string[]) => {
+    const newFilters = { ...filters, selectedStatus };
+    setFilters(newFilters);
+    applyFilters(newFilters);
+  };
+
   const clearFilters = () => {
     const emptyFilters: FilterState = {
       dateFrom: '',
       dateTo: '',
-      status: '',
-      categoria: '',
+      selectedStatus: [],
+      selectedCategories: [],
       searchText: ''
     };
     setFilters(emptyFilters);
@@ -133,33 +150,23 @@ export const Filters: React.FC<FiltersProps> = ({ records, onFilterChange }) => 
         </div>
 
         <div className="filter-group">
-          <label htmlFor="status">Status:</label>
-          <select
-            id="status"
-            value={filters.status}
-            onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="filter-select"
-          >
-            <option value="">Todos</option>
-            {statusOptions.map(status => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
+          <label>Status:</label>
+          <MultiSelectDropdown
+            label="Status"
+            options={statusOptions}
+            selected={filters.selectedStatus}
+            onChange={handleStatusChange}
+          />
         </div>
 
         <div className="filter-group">
-          <label htmlFor="categoria">Categoria:</label>
-          <select
-            id="categoria"
-            value={filters.categoria}
-            onChange={(e) => handleFilterChange('categoria', e.target.value)}
-            className="filter-select"
-          >
-            <option value="">Todas</option>
-            {categories.map(categoria => (
-              <option key={categoria} value={categoria}>{categoria}</option>
-            ))}
-          </select>
+          <label>Categoria:</label>
+          <MultiSelectDropdown
+            label="Categoria"
+            options={categories}
+            selected={filters.selectedCategories}
+            onChange={handleCategoryChange}
+          />
         </div>
 
         <div className="filter-group filter-group-wide">

@@ -515,20 +515,124 @@ export class DataService {
   static getCategoryData(records: FinancialRecord[]): ChartData[] {
     const validRecords = records; // somar tudo
     
-    // Distribuição por tipo baseado na estrutura de categorias DRE
-    const custos = validRecords
-      .filter(r => (r.categoria || '').startsWith('2.1.'))
-      .reduce((sum, r) => sum + Math.abs(r.valorEfetivo), 0);
+    // Função para agrupar categorias DRE em grupos principais
+    const groupCategory = (categoria: string): string => {
+      if (!categoria) return 'Outros';
       
-    const despesas = validRecords
-      .filter(r => (r.categoria || '').startsWith('2.2.') || (r.categoria || '').startsWith('2.3.'))
-      .reduce((sum, r) => sum + Math.abs(r.valorEfetivo), 0);
-
-    return [
-      { name: 'Custos (2.1.x)', value: custos, color: '#ef4444' },
-      { name: 'Despesas (2.2.x + 2.3.x)', value: despesas, color: '#f59e0b' }
-    ];
+      const catLower = categoria.toLowerCase();
+      
+      // Agrupar receitas (1.x)
+      if (categoria.startsWith('1.')) {
+        return 'Receitas';
+      }
+      
+      // Agrupar custos com veículos (2.1.1.x)
+      if (categoria.startsWith('2.1.1.') || catLower.includes('locação') ||
+          catLower.includes('locacao') || catLower.includes('manutenção') ||
+          catLower.includes('manutencao') || catLower.includes('ipva') ||
+          catLower.includes('licenciamento') || catLower.includes('dpvat')) {
+        return 'Custos com Veículos';
+      }
+      
+      // Agrupar sinistros (2.1.1.13 e similares)
+      if (catLower.includes('sinistro') || categoria.includes('2.1.1.13')) {
+        return 'Sinistros';
+      }
+      
+      // Agrupar encargos trabalhistas (2.2.2.x)
+      if (categoria.startsWith('2.2.2.') || catLower.includes('fgts') ||
+          catLower.includes('multa fgts') || catLower.includes('inss') ||
+          catLower.includes('encargo')) {
+        return 'Encargos Trabalhistas';
+      }
+      
+      // Agrupar salários (2.2.1.x)
+      if (categoria.startsWith('2.2.1.') || catLower.includes('salário') || 
+          catLower.includes('salario') || catLower.includes('ordenado')) {
+        return 'Salários';
+      }
+      
+      // Agrupar impostos e taxas (2.2.6.x)
+      if (categoria.startsWith('2.2.6.') || catLower.includes('iptu') ||
+          catLower.includes('imposto') || catLower.includes('taxa') ||
+          catLower.includes('tributo') || catLower.includes('contribuição')) {
+        return 'Impostos e Taxas';
+      }
+      
+      // Agrupar combustível
+      if (catLower.includes('combustível') || catLower.includes('combustivel') ||
+          catLower.includes('gasolina') || catLower.includes('diesel')) {
+        return 'Combustível';
+      }
+      
+      // Agrupar seguros
+      if (catLower.includes('seguro')) {
+        return 'Seguros';
+      }
+      
+      // Agrupar despesas administrativas (2.2.3.x, 2.2.4.x, 2.2.5.x)
+      if (categoria.startsWith('2.2.3.') || categoria.startsWith('2.2.4.') ||
+          categoria.startsWith('2.2.5.') || catLower.includes('administrativ') ||
+          catLower.includes('escritório') || catLower.includes('escritorio') ||
+          catLower.includes('telefone') || catLower.includes('internet') ||
+          catLower.includes('energia') || catLower.includes('aluguel')) {
+        return 'Despesas Administrativas';
+      }
+      
+      // Agrupar despesas operacionais (2.3.x)
+      if (categoria.startsWith('2.3.') || catLower.includes('marketing') ||
+          catLower.includes('publicidade') || catLower.includes('intermediação') ||
+          catLower.includes('intermediacao') || catLower.includes('operacional')) {
+        return 'Despesas Operacionais';
+      }
+      
+      // Se não se encaixa em nenhum grupo específico, verificar se é uma categoria DRE genérica
+      if (categoria.match(/^\d+\./)) {
+        return 'Outras Categorias DRE';
+      }
+      
+      // Se não é categoria DRE, manter original
+      return categoria;
+    };
+    
+    // Agrupar dados por categoria
+    const groupedData: { [key: string]: number } = {};
+    
+    validRecords.forEach(record => {
+      const groupName = groupCategory(record.categoria);
+      if (!groupedData[groupName]) {
+        groupedData[groupName] = 0;
+      }
+      groupedData[groupName] += Math.abs(record.valorEfetivo);
+    });
+    
+    // Paleta de cores harmoniosa com verde como destaque
+    const colors: { [key: string]: string } = {
+      'Receitas': '#16A34A',           // Verde principal (destaque)
+      'Custos com Veículos': '#F97316', // Laranja
+      'Sinistros': '#EF4444',          // Vermelho suave
+      'Salários': '#3B82F6',           // Azul
+      'Encargos Trabalhistas': '#6366F1', // Azul índigo
+      'Impostos e Taxas': '#8B5CF6',   // Roxo
+      'Combustível': '#F59E0B',        // Âmbar
+      'Seguros': '#10B981',            // Verde esmeralda
+      'Despesas Administrativas': '#F59E0B', // Âmbar
+      'Despesas Operacionais': '#EC4899', // Rosa
+      'Outras Categorias DRE': '#6B7280', // Cinza neutro
+      'Outros': '#9CA3AF'             // Cinza claro
+    };
+    
+    // Converter para formato do gráfico e ordenar por valor
+    return Object.entries(groupedData)
+      .filter(([_, value]) => value > 0)
+      .sort(([, a], [, b]) => b - a)
+      .map(([name, value], index) => ({
+        name,
+        value,
+        color: colors[name] || `hsl(${index * 36}, 65%, 50%)`
+      }));
   }
+
 
   static getEvolutionData(records: FinancialRecord[]): ChartData[] {
     const validRecords = records; // somar tudo
@@ -590,9 +694,9 @@ export class DataService {
       .reduce((sum, r) => sum + Math.abs(r.valorEfetivo), 0);
 
     return [
-      { name: 'Receita Bruta', value: receita, color: '#4CAF50' },
-      { name: 'Custos', value: custos, color: '#2196F3' },
-      { name: 'Despesas', value: despesas, color: '#F44336' }
+      { name: 'Receita Bruta', value: receita, color: '#16A34A' }, // Verde
+      { name: 'Custos', value: custos, color: '#DC2626' },         // Vermelho
+      { name: 'Despesas', value: despesas, color: '#F97316' }      // Laranja
     ];
   }
 

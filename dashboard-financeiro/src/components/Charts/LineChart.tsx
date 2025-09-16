@@ -9,6 +9,7 @@ interface LineChartProps {
 }
 
 export const CustomLineChart: React.FC<LineChartProps> = ({ data, title }) => {
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -40,11 +41,16 @@ export const CustomLineChart: React.FC<LineChartProps> = ({ data, title }) => {
     <div className="chart-container">
       <h3 className="chart-title">{title}</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
+        <LineChart 
+          data={data}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="name" 
-            tick={{ fontSize: 12 }}
+            tick={{ 
+              fontSize: 12,
+              className: 'chart-tick'
+            }}
             tickFormatter={(value) => {
               const [year, month] = value.split('-');
               const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 
@@ -53,7 +59,10 @@ export const CustomLineChart: React.FC<LineChartProps> = ({ data, title }) => {
             }}
           />
           <YAxis 
-            tick={{ fontSize: 12 }}
+            tick={{ 
+              fontSize: 12,
+              className: 'chart-tick'
+            }}
             tickFormatter={(value) => DataService.formatCurrency(value)}
           />
           <Tooltip content={<CustomTooltip />} />
@@ -61,7 +70,7 @@ export const CustomLineChart: React.FC<LineChartProps> = ({ data, title }) => {
           <Line 
             type="monotone" 
             dataKey="receita" 
-            stroke="#10b981" 
+            stroke="#16A34A" 
             strokeWidth={2}
             name="Receita"
             dot={{ r: 4 }}
@@ -70,7 +79,7 @@ export const CustomLineChart: React.FC<LineChartProps> = ({ data, title }) => {
           <Line 
             type="monotone" 
             dataKey="lucro" 
-            stroke="#3b82f6" 
+            stroke="#2563EB" 
             strokeWidth={2}
             name="Lucro"
             dot={{ r: 4 }}
