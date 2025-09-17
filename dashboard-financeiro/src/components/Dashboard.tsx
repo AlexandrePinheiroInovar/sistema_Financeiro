@@ -570,15 +570,62 @@ export const Dashboard: React.FC = () => {
                   <strong>{records.length}</strong> total
                 </p>
 
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="upload-button"
-                  style={{ marginLeft: 'auto' }}
-                  title="Limpa os dados carregados para subir uma nova planilha"
-                  disabled={isDeleting}
-                >
-                  Apagar Tudo
-                </button>
+                <div style={{ display: 'flex', gap: '12px', marginLeft: 'auto', alignItems: 'center' }}>
+                  {/* Botão de importar nova planilha - apenas para administradores */}
+                  {user?.role === 'admin' && (
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="file"
+                        id="file-input-dashboard"
+                        accept=".csv,.xlsx,.xls"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            // Criar um evento simulado para usar a mesma lógica do FileUpload
+                            const fakeFileUpload = {
+                              handleFile: async (file: File) => {
+                                try {
+                                  const data = await DataService.parseFile(file);
+                                  if (data.length === 0) {
+                                    alert('Nenhum registro válido encontrado no arquivo.');
+                                    return;
+                                  }
+                                  // Mesclar novos dados com os existentes
+                                  const mergedData = [...records, ...data];
+                                  await handleDataLoaded(mergedData);
+                                } catch (err) {
+                                  alert(err instanceof Error ? err.message : 'Erro ao processar arquivo');
+                                }
+                              }
+                            };
+                            fakeFileUpload.handleFile(file);
+                          }
+                          // Limpar o input para permitir selecionar o mesmo arquivo novamente
+                          e.target.value = '';
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      <label
+                        htmlFor="file-input-dashboard"
+                        className="upload-button"
+                        style={{ cursor: 'pointer', margin: 0 }}
+                        title="Adicionar mais dados ao sistema"
+                      >
+                        📊 Importar Planilha
+                      </label>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="upload-button"
+                    title="Limpa os dados carregados para subir uma nova planilha"
+                    disabled={isDeleting}
+                    style={{ margin: 0 }}
+                  >
+                    🗑️ Apagar Tudo
+                  </button>
+                </div>
               </div>
 
               <Filters records={records} onFilterChange={handleFilterChange} />
@@ -631,10 +678,10 @@ export const Dashboard: React.FC = () => {
         {/* Modal de confirmação de exclusão */}
         <ConfirmModal
           isOpen={showDeleteConfirm}
-          title="Confirmar Exclusão"
-          message={`Tem certeza que deseja apagar todos os ${records.length} registros? Esta ação não pode ser desfeita.`}
-          confirmText="Apagar Tudo"
-          cancelText="Cancelar"
+          title="Apagar tudo?"
+          message={`Deseja realmente apagar todos os dados do sistema? Esta ação não pode ser desfeita.`}
+          confirmText="🗑️ Sim, apagar tudo"
+          cancelText="Não, cancelar"
           onConfirm={handleDeleteConfirm}
           onCancel={() => {
             console.log('🔍 Modal cancelado');

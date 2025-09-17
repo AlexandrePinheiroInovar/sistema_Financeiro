@@ -43,7 +43,7 @@ export class FirestoreService {
         batchRecords.forEach(record => {
           const recordWithMetadata = {
             ...record,
-            userId: userId || 'anonymous',
+            uploadedBy: userId || 'anonymous', // Manter registro de quem fez upload
             uploadedAt: Timestamp.now(),
             createdAt: Timestamp.now()
           };
@@ -84,7 +84,7 @@ export class FirestoreService {
     }
   }
 
-  // Carregar registros financeiros do usuário
+  // Carregar registros financeiros (sistema compartilhado)
   static async loadRecords(userId?: string): Promise<FinancialRecord[]> {
     try {
       console.log('🔥 Carregando registros do Firestore...');
@@ -99,12 +99,10 @@ export class FirestoreService {
       
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        // Filtrar por usuário se especificado
-        if (!userId || data.userId === userId || data.userId === 'anonymous') {
-          // Remover metadados do Firebase antes de retornar
-          const { userId: _, uploadedAt, createdAt, ...financialRecord } = data;
-          records.push(financialRecord as FinancialRecord);
-        }
+        // Todos os usuários veem todos os dados (sistema compartilhado)
+        // Remover metadados do Firebase antes de retornar
+        const { uploadedBy: _, uploadedAt, createdAt, ...financialRecord } = data;
+        records.push(financialRecord as FinancialRecord);
       });
       
       console.log(`✅ ${records.length} registros carregados do Firestore`);
@@ -116,10 +114,10 @@ export class FirestoreService {
     }
   }
 
-  // Limpar registros do usuário usando batch delete (mais eficiente)
+  // Limpar todos os registros (sistema compartilhado)
   static async clearUserRecords(userId?: string): Promise<void> {
     try {
-      console.log('🗑️ Limpando registros anteriores para usuário:', userId || 'anonymous');
+      console.log('🗑️ Limpando todos os registros anteriores (sistema compartilhado)');
 
       const q = query(collection(db, this.COLLECTION_NAME));
       console.log('📋 Buscando documentos para deletar...');
@@ -129,11 +127,8 @@ export class FirestoreService {
       const docsToDelete: string[] = [];
 
       querySnapshot.forEach((docSnapshot) => {
-        const data = docSnapshot.data();
-        // Deletar registros do usuário ou anônimos
-        if (!userId || data.userId === userId || data.userId === 'anonymous') {
-          docsToDelete.push(docSnapshot.id);
-        }
+        // Deletar todos os registros (sistema compartilhado)
+        docsToDelete.push(docSnapshot.id);
       });
 
       console.log(`🗑️ ${docsToDelete.length} documentos serão deletados`);
