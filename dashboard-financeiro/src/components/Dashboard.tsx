@@ -616,15 +616,18 @@ export const Dashboard: React.FC = () => {
                     </div>
                   )}
 
-                  <button
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="upload-button"
-                    title="Limpa os dados carregados para subir uma nova planilha"
-                    disabled={isDeleting}
-                    style={{ margin: 0 }}
-                  >
-                    🗑️ Apagar Tudo
-                  </button>
+                  {/* Botão de apagar dados - apenas para administradores */}
+                  {user?.role === 'admin' && (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="upload-button"
+                      title="Limpa os dados carregados para subir uma nova planilha"
+                      disabled={isDeleting}
+                      style={{ margin: 0 }}
+                    >
+                      🗑️ Apagar Tudo
+                    </button>
+                  )}
                 </div>
               </div>
 
